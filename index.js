@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const objectId = require('mongodb').ObjectId
 
 const port = process.env.port || 5000
 
@@ -21,11 +22,22 @@ async function run(){
       const users = await cursor.toArray() 
       res.send(users)
     })
-
+    app.get('/user/:id', async(req, res)=>{
+      const id = req.params.id
+      const query = {_id:objectId(id)}
+      const result = await userCollection.findOne(query)
+      res.send(result)
+    })
     app.post('/user', async(req, res)=>{
       const newUser = req.body
       console.log('add new user', newUser)
       const result = await userCollection.insertOne(newUser)
+      res.send(result)
+    })
+    app.delete('/user/:id', async(req, res)=>{
+      const id = req.params.id 
+      const query = {_id:objectId(id)}
+      const result = await userCollection.deleteOne(query)
       res.send(result)
     })
   }
